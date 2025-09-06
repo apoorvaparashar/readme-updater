@@ -1,2 +1,33 @@
 # readme-updater
-update github readme daily to increase productivity
+**android app for updating github readme on your home screen**
+
+<br>
+
+## Download
+
+[![Releases](https://img.shields.io/badge/Releases-coming%20soon-blue?style=for-the-badge)](https://github.com/IMOitself/AfterBuild/releases)
+<br>
+[![Compiled Apk](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterBuild/blob/master/compiled.apk)
+
+
+## Feats and Progress
+
+- [x] home screen widget
+- [x] update widget
+- [x] remember widget content
+- [ ] get readme using [AfterRun](https://github.com/IMOitself/AfterRun/tree/966e6317eba59add8cb193e976b77d6ca439bd8c) and Termux
+- [ ] commit locally
+- [ ] push to github
+
+<br>
+
+## Screenshots
+
+> [!TIP]
+> LATER :D
+
+<br>
+
+<img src="assets/ss1.jpg" width="200"><img src="assets/ss2.jpg" width="200">
+<img src="assets/ss3.jpg" width="200">
+<img src="assets/ss4.jpg" width="200">
