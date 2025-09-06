@@ -5,9 +5,9 @@
 
 ## Download
 
-[![Releases](https://img.shields.io/badge/Releases-coming%20soon-blue?style=for-the-badge)](https://github.com/IMOitself/AfterBuild/releases)
+[![Releases](https://img.shields.io/badge/Releases-coming%20soon-blue?style=for-the-badge)](https://github.com/IMOitself/readme-updater/releases)
 <br>
-[![Compiled Apk](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/AfterBuild/blob/master/compiled.apk)
+[![Compiled Apk](https://img.shields.io/badge/compiled.apk-blue?style=for-the-badge)](https://github.com/IMOitself/readme-updater/blob/master/compiled.apk)
 
 
 ## Feats and Progress
