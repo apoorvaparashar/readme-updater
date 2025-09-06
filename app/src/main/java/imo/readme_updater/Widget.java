@@ -11,17 +11,21 @@ import android.widget.RemoteViews;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import android.content.SharedPreferences;
 
 public class Widget extends AppWidgetProvider {
-    private static final String ACTION_WIDGET_UPDATE = "ACTION_WIDGET_UPDATE";
+    public static final String ACTION_WIDGET_UPDATE = "ACTION_WIDGET_UPDATE";
 
     static void updateWidget(Context context, AppWidgetManager manager, int appWidgetId) {
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-
+        
+        SharedPreferences sp = context.getSharedPreferences("hehe", Context.MODE_PRIVATE);
+        int i = sp.getInt("clicker", -1);
+        
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
-        views.setTextViewText(R.id.widget_text, "hello world :D");
+        views.setTextViewText(R.id.widget_text, i+"");
 
         manager.updateAppWidget(appWidgetId, views);
     }
