@@ -23,8 +23,9 @@
 
 ## Screenshots
 
-> [!TIP]
-> LATER :D
+> [!NOTE]
+> last captured screenshot. <br>
+> current development might differ.
 
 <br>
 
