@@ -6,12 +6,8 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import android.widget.RemoteViews;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 import android.content.SharedPreferences;
+import android.widget.RemoteViews;
 
 public class Widget extends AppWidgetProvider {
     public static final String ACTION_WIDGET_UPDATE = "ACTION_WIDGET_UPDATE";
@@ -21,11 +17,11 @@ public class Widget extends AppWidgetProvider {
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         
         SharedPreferences sp = context.getSharedPreferences("hehe", Context.MODE_PRIVATE);
-        int i = sp.getInt("clicker", -1);
+        String savedString = sp.getString(MainActivity.WIDGET_STRING_KEY, "");
         
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
         views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
-        views.setTextViewText(R.id.widget_text, i+"");
+        views.setTextViewText(R.id.widget_text, savedString);
 
         manager.updateAppWidget(appWidgetId, views);
     }
@@ -38,13 +34,13 @@ public class Widget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
-        if (ACTION_WIDGET_UPDATE.equals(intent.getAction())) {
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            ComponentName thisWidget = new ComponentName(context, Widget.class);
-            int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
+        if (! ACTION_WIDGET_UPDATE.equals(intent.getAction())) return;
+            
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        ComponentName thisWidget = new ComponentName(context, Widget.class);
+        int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
 
-            onUpdate(context, appWidgetManager, allWidgetIds);
-        }
+        onUpdate(context, appWidgetManager, allWidgetIds);
 
         super.onReceive(context, intent);
     }

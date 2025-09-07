@@ -7,45 +7,65 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
+    final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
+    Button updateButton;
+    TextView outputTextview;
     int i = -1;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        final Button clickerButton = findViewById(R.id.clicker_button);
-        final Button updateButton = findViewById(R.id.update_button);
         
-        SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
+        CommandTermux.checkAndRequestPermissions(this);
         
-        i = sp.getInt("clicker", -1);
-        clickerButton.setText(i+"");
-        clickerButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    i++;
-                    clickerButton.setText(i+"");
-                }
-            });
-
+        outputTextview = findViewById(R.id.output_textview);
+        updateButton = findViewById(R.id.update_button);
+        
         updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
-                    spEditor.putInt("clicker", i);
-                    spEditor.apply();
-
-                    Intent intent = new Intent(MainActivity.this, Widget.class);
-                    intent.setAction(Widget.ACTION_WIDGET_UPDATE);
-                    sendBroadcast(intent);
-                    Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
-                    finish();
+                    saveData();
                 }
             });
+    }
+    
+    void saveData(){
+        String command = "pwd";
+        final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
+        final String previousString = outputTextview.getText().toString();
+        updateButton.setEnabled(false);
+
+        new CommandTermux(command, MainActivity.this)
+            .quickSetOutput(outputTextview, new Runnable(){
+                @Override
+                public void run(){
+                    String output = outputTextview.getText().toString();
+                    spEditor.putString(WIDGET_STRING_KEY, output);
+                    spEditor.apply();
+                    updateWidget();
+                }
+            })
+            .setOnError(new Runnable(){// this runs if sending command to termux encounter an error
+                @Override
+                public void run(){
+                    CommandTermux.stopDetector(); // still waits for output and should be stopped
+                    outputTextview.setText(previousString);
+                    updateButton.setEnabled(true);
+                }
+            })
+            .run();
+    }
+    
+    void updateWidget(){
+        Intent intent = new Intent(MainActivity.this, Widget.class);
+        intent.setAction(Widget.ACTION_WIDGET_UPDATE);
+        sendBroadcast(intent);
+        Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
+        finish();
     }
 }
