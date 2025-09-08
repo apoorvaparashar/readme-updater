@@ -29,9 +29,14 @@
 
 <br>
 
+## Installation 
+Refer to this guide:
+[![installation](https://img.shields.io/badge/AfterRun-Installation-blue?style=for-the-badge)](
+https://github.com/IMOitself/AfterRun?tab=readme-ov-file#installation)
+ 
+
 ## Screenshots
 
-> [!NOTE]
 > last captured screenshot. <br>
 > current development might differ.
 
