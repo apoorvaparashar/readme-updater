@@ -21,6 +21,7 @@ public class MainActivity extends Activity {
     final static String REPO_URL_KEY = "REPO_URL_KEY";
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button updateButton;
+    Button updateAndCloseButton;
     TextView commandOutputTextview;
     EditText repoLinkEdittext;
     int i = -1;
@@ -35,6 +36,7 @@ public class MainActivity extends Activity {
         repoLinkEdittext = findViewById(R.id.repo_link_edittext);
         commandOutputTextview = findViewById(R.id.command_output_textview);
         updateButton = findViewById(R.id.update_button);
+        updateAndCloseButton = findViewById(R.id.update_and_close_button);
         
         SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
         repoLinkEdittext.setText(sp.getString(REPO_URL_KEY, ""));
@@ -42,12 +44,19 @@ public class MainActivity extends Activity {
         updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveData();
+                    saveData(false);
+                }
+            });
+            
+        updateAndCloseButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveData(true);
                 }
             });
     }
     
-    void saveData(){
+    void saveData(final boolean closeAfter){
         final String repositoryURL = repoLinkEdittext.getText().toString().trim();
         final String folderName = "downloaded_repository";
         final String outputSeparator = "OUTPUT_SEPARATOR";
@@ -75,7 +84,8 @@ public class MainActivity extends Activity {
                     spEditor.apply();
                     
                     updateWidget();
-                    //finish();
+                    
+                    if(closeAfter) finish();
                 }
             })
             .setOnError(new Runnable(){// this runs if sending command to termux encounter an error
