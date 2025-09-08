@@ -23,5 +23,4 @@ cd <folder_name>
 
 echo <output_separator>
 
-git config --get remote.origin.url
 echo $(grep -m 1 '^#' README.md)
