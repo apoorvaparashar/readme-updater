@@ -18,12 +18,12 @@
 ✅ home screen widget
 ✅ update widget
 ✅ remember widget content
-⬜ clone a repo using [AfterRun](https://github.com/IMOitself/AfterRun/tree/966e6317eba59add8cb193e976b77d6ca439bd8c) and Termux
+✅ run bash commands via [AfterRun](https://github.com/IMOitself/AfterRun/tree/966e6317eba59add8cb193e976b77d6ca439bd8c) and Termux
+⬜ clone a repo and set folder
 ⬜ get README.md
 ⬜ update a section of the README.md
 ⬜ commit locally
 ⬜ push to github
-⬜ daily streak system
 
 <br>
 
