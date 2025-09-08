@@ -1,5 +1,7 @@
-# readme-updater
+# readme-updater*
 **android app for updating github readme on your home screen**
+
+> \* subject to change
 
 <br>
 
@@ -19,11 +21,11 @@
 ✅ update widget
 ✅ remember widget content
 ✅ run bash commands via [AfterRun](https://github.com/IMOitself/AfterRun/tree/966e6317eba59add8cb193e976b77d6ca439bd8c) and Termux
-⬜ clone a repo and set folder
-⬜ get README.md
-⬜ update a section of the README.md
+✅ clone and get README.md
+⬜ daily quote creator
 ⬜ commit locally
-⬜ push to github
+⬜ git push
+⬜ scheduled daily quote 
 
 <br>
 
