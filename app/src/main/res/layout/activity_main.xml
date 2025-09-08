@@ -27,15 +27,14 @@
 		android:maxLines="10"
 		android:padding="8dp"
 		android:background="#0E000000"
-		android:id="@+id/output_textview"/>
+		android:id="@+id/command_output_textview"/>
 
 	<Button
-		android:layout_width="wrap_content"
+		android:layout_width="match_parent"
 		style="?android:attr/buttonBarButtonStyle"
 		android:layout_height="wrap_content"
-		android:text="update"
-		android:id="@+id/update_button"
-		android:textSize="32sp"/>
+		android:text="update widget"
+		android:id="@+id/update_button"/>
 
 	<View
 		android:layout_width="1dp"

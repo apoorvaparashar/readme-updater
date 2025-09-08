@@ -20,7 +20,7 @@ import android.widget.EditText;
 public class MainActivity extends Activity {
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button updateButton;
-    TextView outputTextview;
+    TextView commandOutputTextview;
     EditText repoLinkEdittext;
     int i = -1;
     
@@ -32,7 +32,7 @@ public class MainActivity extends Activity {
         CommandTermux.checkAndRequestPermissions(this);
         
         repoLinkEdittext = findViewById(R.id.repo_link_edittext);
-        outputTextview = findViewById(R.id.output_textview);
+        commandOutputTextview = findViewById(R.id.command_output_textview);
         updateButton = findViewById(R.id.update_button);
         
         updateButton.setOnClickListener(new View.OnClickListener() {
@@ -54,14 +54,14 @@ public class MainActivity extends Activity {
         command = command.replace("<output_separator>", outputSeparator);
         
         final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
-        final String previousString = outputTextview.getText().toString();
+        final String previousString = commandOutputTextview.getText().toString();
         updateButton.setEnabled(false);
 
         new CommandTermux(command, MainActivity.this)
-            .quickSetOutputWithLoading(outputTextview, new Runnable(){
+            .quickSetOutputWithLoading(commandOutputTextview, new Runnable(){
                 @Override
                 public void run(){
-                    String output = outputTextview.getText().toString();
+                    String output = commandOutputTextview.getText().toString();
                     output = output.split(outputSeparator)[1].trim();
                     
                     spEditor.putString(WIDGET_STRING_KEY, output);
@@ -75,7 +75,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void run(){
                     CommandTermux.stopDetector(); // still waits for output and should be stopped
-                    outputTextview.setText(previousString);
+                    commandOutputTextview.setText(previousString);
                     updateButton.setEnabled(true);
                 }
             })
