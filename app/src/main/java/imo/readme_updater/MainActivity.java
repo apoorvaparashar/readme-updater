@@ -18,6 +18,7 @@ import java.io.StringWriter;
 import android.widget.EditText;
 
 public class MainActivity extends Activity {
+    final static String REPO_URL_KEY = "REPO_URL_KEY";
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button updateButton;
     TextView commandOutputTextview;
@@ -35,6 +36,9 @@ public class MainActivity extends Activity {
         commandOutputTextview = findViewById(R.id.command_output_textview);
         updateButton = findViewById(R.id.update_button);
         
+        SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
+        repoLinkEdittext.setText(sp.getString(REPO_URL_KEY, ""));
+        
         updateButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -47,6 +51,8 @@ public class MainActivity extends Activity {
         final String repositoryURL = repoLinkEdittext.getText().toString().trim();
         final String folderName = "downloaded_repository";
         final String outputSeparator = "OUTPUT_SEPARATOR";
+        
+        if(repositoryURL.isEmpty() || ! repositoryURL.contains("https://")) return;
         
         String command = readFileFromAssets("command.sh");
         command = command.replace("<repo_url>", repositoryURL);
@@ -65,6 +71,7 @@ public class MainActivity extends Activity {
                     output = output.split(outputSeparator)[1].trim();
                     
                     spEditor.putString(WIDGET_STRING_KEY, output);
+                    spEditor.putString(REPO_URL_KEY, repositoryURL);
                     spEditor.apply();
                     
                     updateWidget();
