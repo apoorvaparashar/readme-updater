@@ -11,11 +11,18 @@
 		android:layout_height="wrap_content"
 		android:layout_weight="1.0"/>
 
+	<EditText
+		android:layout_width="match_parent"
+		android:inputType="textMultiLine"
+		android:layout_height="wrap_content"
+		android:hint="github repository link..."
+		android:id="@+id/repo_link_edittext"/>
+
 	<TextView
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
 		android:text="command output here"
-		android:textAppearance="?android:attr/textAppearanceMedium"
+		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:typeface="monospace"
 		android:maxLines="10"
 		android:padding="8dp"

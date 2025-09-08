@@ -9,11 +9,19 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import android.widget.EditText;
 
 public class MainActivity extends Activity {
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button updateButton;
     TextView outputTextview;
+    EditText repoLinkEdittext;
     int i = -1;
     
     @Override
@@ -23,6 +31,7 @@ public class MainActivity extends Activity {
         
         CommandTermux.checkAndRequestPermissions(this);
         
+        repoLinkEdittext = findViewById(R.id.repo_link_edittext);
         outputTextview = findViewById(R.id.output_textview);
         updateButton = findViewById(R.id.update_button);
         
@@ -35,19 +44,31 @@ public class MainActivity extends Activity {
     }
     
     void saveData(){
-        String command = "pwd";
+        final String repositoryURL = repoLinkEdittext.getText().toString().trim();
+        final String folderName = "downloaded_repository";
+        final String outputSeparator = "OUTPUT_SEPARATOR";
+        
+        String command = readFileFromAssets("command.sh");
+        command = command.replace("<repo_url>", repositoryURL);
+        command = command.replace("<folder_name>", folderName);
+        command = command.replace("<output_separator>", outputSeparator);
+        
         final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
         final String previousString = outputTextview.getText().toString();
         updateButton.setEnabled(false);
 
         new CommandTermux(command, MainActivity.this)
-            .quickSetOutput(outputTextview, new Runnable(){
+            .quickSetOutputWithLoading(outputTextview, new Runnable(){
                 @Override
                 public void run(){
                     String output = outputTextview.getText().toString();
+                    output = output.split(outputSeparator)[1].trim();
+                    
                     spEditor.putString(WIDGET_STRING_KEY, output);
                     spEditor.apply();
+                    
                     updateWidget();
+                    //finish();
                 }
             })
             .setOnError(new Runnable(){// this runs if sending command to termux encounter an error
@@ -66,6 +87,31 @@ public class MainActivity extends Activity {
         intent.setAction(Widget.ACTION_WIDGET_UPDATE);
         sendBroadcast(intent);
         Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
-        finish();
+    }
+    
+    boolean checkIfGitRepository(String s){
+        return true;
+    }
+    
+    private String readFileFromAssets(String filePath) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            InputStream inputStream = this.getAssets().open(filePath);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            inputStream.close();
+            reader.close();
+
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            return sw.toString();
+        }
+        return stringBuilder.toString();
     }
 }
