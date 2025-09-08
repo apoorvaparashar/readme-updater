@@ -71,6 +71,7 @@ public class MainActivity extends Activity {
         final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
         final String previousString = commandOutputTextview.getText().toString();
         updateButton.setEnabled(false);
+        updateAndCloseButton.setEnabled(false);
 
         new CommandTermux(command, MainActivity.this)
             .quickSetOutputWithLoading(commandOutputTextview, new Runnable(){
@@ -94,6 +95,7 @@ public class MainActivity extends Activity {
                     CommandTermux.stopDetector(); // still waits for output and should be stopped
                     commandOutputTextview.setText(previousString);
                     updateButton.setEnabled(true);
+                    updateAndCloseButton.setEnabled(false);
                 }
             })
             .run();
