@@ -95,7 +95,7 @@ public class MainActivity extends Activity {
                     CommandTermux.stopDetector(); // still waits for output and should be stopped
                     commandOutputTextview.setText(previousString);
                     updateButton.setEnabled(true);
-                    updateAndCloseButton.setEnabled(false);
+                    updateAndCloseButton.setEnabled(true);
                 }
             })
             .run();
