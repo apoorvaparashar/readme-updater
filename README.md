@@ -1,7 +1,6 @@
-# readme-updater*
-**android app for updating github readme on your home screen**
+# readme-updater\*
 
-> \* subject to change
+**android app for updating README.md directly on your home screen. this should help you get productive somehow, probably**
 
 <br>
 
@@ -20,7 +19,6 @@
 ✅ home screen widget
 ✅ update widget
 ✅ remember widget content
-✅ run bash commands via [AfterRun](https://github.com/IMOitself/AfterRun/tree/966e6317eba59add8cb193e976b77d6ca439bd8c) and Termux
 ✅ clone and get README.md
 ⬜ daily quote creator
 ⬜ commit locally
@@ -28,12 +26,6 @@
 ⬜ scheduled daily quote 
 
 <br>
-
-## Installation 
-Refer to this guide:
-[![installation](https://img.shields.io/badge/AfterRun-Installation-blue?style=for-the-badge)](
-https://github.com/IMOitself/AfterRun?tab=readme-ov-file#installation)
- 
 
 ## Screenshots
 
