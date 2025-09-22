@@ -3,7 +3,6 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:gravity="center"
 	android:orientation="vertical">
 
 	<EditText
@@ -12,6 +11,12 @@
 		android:layout_height="wrap_content"
 		android:hint="github repository link..."
 		android:id="@+id/repo_link_edittext"/>
+
+	<CheckBox
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="line wrap"
+		android:id="@+id/is_linewrap_checkbox"/>
 
 	<EditText
 		android:layout_width="match_parent"

@@ -7,8 +7,11 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executors;
 import org.eclipse.jgit.api.Git;
+import android.widget.CompoundButton;
 
 public class MainActivity extends Activity {
     final static String REPO_URL_KEY = "REPO_URL_KEY";
@@ -28,6 +32,7 @@ public class MainActivity extends Activity {
     Button fetchAndCloseButton;
     TextView outputEdittext;
     EditText repoLinkEdittext;
+	CheckBox isLineWrapCheckbox;
 	boolean buttonOnClickCloseApp = false;
 	String repositoryURL;
     
@@ -40,6 +45,7 @@ public class MainActivity extends Activity {
         outputEdittext = findViewById(R.id.command_output_edittext);
         fetchButton = findViewById(R.id.update_button);
         fetchAndCloseButton = findViewById(R.id.update_and_close_button);
+		isLineWrapCheckbox = findViewById(R.id.is_linewrap_checkbox);
 		
 		outputEdittext.setFocusable(false);
 		outputEdittext.setFocusableInTouchMode(false);
@@ -62,6 +68,14 @@ public class MainActivity extends Activity {
 					saveData();
                 }
             });
+		
+		isLineWrapCheckbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+			@Override
+			public void onCheckedChanged(CompoundButton v, boolean isChecked){
+				outputEdittext.setHorizontallyScrolling(isChecked);
+				outputEdittext.setMovementMethod(new ScrollingMovementMethod());
+			}
+		});
     }
     
     void saveData(){
