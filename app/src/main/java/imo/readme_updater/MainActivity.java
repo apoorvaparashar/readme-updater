@@ -22,19 +22,16 @@ public class MainActivity extends Activity {
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button updateButton;
     Button updateAndCloseButton;
-    TextView commandOutputTextview;
+    TextView outputTextview;
     EditText repoLinkEdittext;
-    int i = -1;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         
-        CommandTermux.checkAndRequestPermissions(this);
-        
         repoLinkEdittext = findViewById(R.id.repo_link_edittext);
-        commandOutputTextview = findViewById(R.id.command_output_textview);
+        outputTextview = findViewById(R.id.command_output_textview);
         updateButton = findViewById(R.id.update_button);
         updateAndCloseButton = findViewById(R.id.update_and_close_button);
         
@@ -58,47 +55,16 @@ public class MainActivity extends Activity {
     
     void saveData(final boolean closeAfter){
         final String repositoryURL = repoLinkEdittext.getText().toString().trim();
-        final String folderName = "downloaded_repository";
-        final String outputSeparator = "OUTPUT_SEPARATOR";
-        
-        if(repositoryURL.isEmpty() || ! repositoryURL.contains("https://")) return;
-        
-        String command = readFileFromAssets("command.sh");
-        command = command.replace("<repo_url>", repositoryURL);
-        command = command.replace("<folder_name>", folderName);
-        command = command.replace("<output_separator>", outputSeparator);
-        
-        final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
-        final String previousString = commandOutputTextview.getText().toString();
-        updateButton.setEnabled(false);
-        updateAndCloseButton.setEnabled(false);
+        String output = /* TODO: get README.md contents using jgit */;
+		
+		final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
+		spEditor.putString(WIDGET_STRING_KEY, output);
+		spEditor.putString(REPO_URL_KEY, repositoryURL);
+		spEditor.apply();
 
-        new CommandTermux(command, MainActivity.this)
-            .quickSetOutputWithLoading(commandOutputTextview, new Runnable(){
-                @Override
-                public void run(){
-                    String output = commandOutputTextview.getText().toString();
-                    output = output.split(outputSeparator)[1].trim();
-                    
-                    spEditor.putString(WIDGET_STRING_KEY, output);
-                    spEditor.putString(REPO_URL_KEY, repositoryURL);
-                    spEditor.apply();
-                    
-                    updateWidget();
-                    
-                    if(closeAfter) finish();
-                }
-            })
-            .setOnError(new Runnable(){// this runs if sending command to termux encounter an error
-                @Override
-                public void run(){
-                    CommandTermux.stopDetector(); // still waits for output and should be stopped
-                    commandOutputTextview.setText(previousString);
-                    updateButton.setEnabled(true);
-                    updateAndCloseButton.setEnabled(true);
-                }
-            })
-            .run();
+		updateWidget();
+
+		if(closeAfter) finish();
     }
     
     void updateWidget(){
@@ -106,31 +72,5 @@ public class MainActivity extends Activity {
         intent.setAction(Widget.ACTION_WIDGET_UPDATE);
         sendBroadcast(intent);
         Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
-    }
-    
-    boolean checkIfGitRepository(String s){
-        return true;
-    }
-    
-    private String readFileFromAssets(String filePath) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            InputStream inputStream = this.getAssets().open(filePath);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                stringBuilder.append(line).append("\n");
-            }
-            inputStream.close();
-            reader.close();
-
-        } catch (IOException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            return sw.toString();
-        }
-        return stringBuilder.toString();
     }
 }
