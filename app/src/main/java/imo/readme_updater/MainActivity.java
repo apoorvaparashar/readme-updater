@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
     Button fetchButton;
     Button fetchAndCloseButton;
-    TextView outputTextview;
+    TextView outputEdittext;
     EditText repoLinkEdittext;
 	boolean buttonOnClickCloseApp = false;
 	String repositoryURL;
@@ -37,9 +37,12 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         
         repoLinkEdittext = findViewById(R.id.repo_link_edittext);
-        outputTextview = findViewById(R.id.command_output_textview);
+        outputEdittext = findViewById(R.id.command_output_edittext);
         fetchButton = findViewById(R.id.update_button);
         fetchAndCloseButton = findViewById(R.id.update_and_close_button);
+		
+		outputEdittext.setFocusable(false);
+		outputEdittext.setFocusableInTouchMode(false);
         
         SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
 		repositoryURL = sp.getString(REPO_URL_KEY, "");
@@ -65,19 +68,12 @@ public class MainActivity extends Activity {
         repositoryURL = repoLinkEdittext.getText().toString().trim();
 		if (! repositoryURL.startsWith("https://")) return;
 		
-		outputTextview.setText("Please Wait...");
+		outputEdittext.setText("Please Wait...");
 		fetchButton.setEnabled(false);
 		fetchAndCloseButton.setEnabled(false);
         fetchReadme(this, repositoryURL);
     }
     
-    void updateWidget(){
-        Intent intent = new Intent(MainActivity.this, Widget.class);
-        intent.setAction(Widget.ACTION_WIDGET_UPDATE);
-        sendBroadcast(intent);
-        Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
-    }
-	
 	public void fetchReadme(final Context context, final String repoUrl) {
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
 				@Override
@@ -118,7 +114,7 @@ public class MainActivity extends Activity {
 	}
 	
 	void saveOutput(String output){
-		outputTextview.setText(output);
+		outputEdittext.setText(output);
 		fetchButton.setEnabled(true);
 		fetchAndCloseButton.setEnabled(true);
 
@@ -131,6 +127,13 @@ public class MainActivity extends Activity {
 
 		if(buttonOnClickCloseApp) finish();
 	}
+	
+	void updateWidget(){
+        Intent intent = new Intent(MainActivity.this, Widget.class);
+        intent.setAction(Widget.ACTION_WIDGET_UPDATE);
+        sendBroadcast(intent);
+        Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
+    }
 
 	private static String readFileToString(File file) throws IOException {
 		StringBuilder sb = new StringBuilder();

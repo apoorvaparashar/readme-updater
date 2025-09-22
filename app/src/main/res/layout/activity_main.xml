@@ -6,11 +6,6 @@
 	android:gravity="center"
 	android:orientation="vertical">
 
-	<View
-		android:layout_width="1dp"
-		android:layout_height="wrap_content"
-		android:layout_weight="1.0"/>
-
 	<EditText
 		android:layout_width="match_parent"
 		android:inputType="textMultiLine"
@@ -18,35 +13,32 @@
 		android:hint="github repository link..."
 		android:id="@+id/repo_link_edittext"/>
 
-	<TextView
+	<EditText
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"
-		android:text="command output here"
+		android:inputType="textMultiLine"
 		android:textAppearance="?android:attr/textAppearanceSmall"
 		android:typeface="monospace"
-		android:maxLines="10"
 		android:padding="8dp"
 		android:background="#0E000000"
-		android:id="@+id/command_output_textview"/>
+		android:id="@+id/command_output_edittext"
+		android:minHeight="16dp"
+		android:layout_weight="3"
+		android:hint="output will be displayed here"/>
 
 	<Button
 		android:layout_width="match_parent"
 		style="?android:attr/buttonBarButtonStyle"
 		android:layout_height="wrap_content"
-		android:text="update widget with README.md"
+		android:text="fetch README.md"
 		android:id="@+id/update_button"/>
 
 	<Button
 		android:layout_width="match_parent"
 		style="?android:attr/buttonBarButtonStyle"
 		android:layout_height="wrap_content"
-		android:text="update widget with README.md and close app"
+		android:text="fetch README.md and close app"
 		android:id="@+id/update_and_close_button"/>
-
-	<View
-		android:layout_width="1dp"
-		android:layout_height="wrap_content"
-		android:layout_weight="1.0"/>
 
 </LinearLayout>
 
