@@ -85,46 +85,50 @@ public class MainActivity extends Activity {
 		outputEdittext.setText("Please Wait...");
 		fetchButton.setEnabled(false);
 		fetchAndCloseButton.setEnabled(false);
-        fetchReadme(this, repositoryURL);
+        fetchReadmeAsync(this, repositoryURL);
     }
     
-	public void fetchReadme(final Context context, final String repoUrl) {
+	public void fetchReadmeAsync(final Context context, final String repoUrl) {
 		Executors.newSingleThreadExecutor().execute(new Runnable() {
 				@Override
 				public void run() {
-					File tempDir = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
-					try {
-						Git.cloneRepository()
-							.setURI(repoUrl)
-							.setDirectory(tempDir)
-							.call().close();
-
-						String content = "README.md not found.";
-						File readmeFile = new File(tempDir, "README.md");
-						if (readmeFile.exists()) content = readFileToString(readmeFile);
-
-						final String finalContent = content;
-						new Handler(Looper.getMainLooper()).post(new Runnable() {
-								@Override
-								public void run() {
-									saveOutput(finalContent);
-								}
-							});
-					} catch (final Exception e) {
-						new Handler(Looper.getMainLooper()).post(new Runnable() {
-								@Override
-								public void run() {
-									StringWriter sw = new StringWriter();
-									PrintWriter pw = new PrintWriter(sw);
-									e.printStackTrace(pw);
-									saveOutput(sw.toString());
-								}
-							});
-					} finally {
-						if (tempDir.exists()) deleteRecursively(tempDir);
-					}
+					fetchReadme(context, repoUrl);
 				}
 			});
+	}
+	
+	private void fetchReadme(final Context context, final String repoUrl){
+		File tempDir = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
+		String output = "";
+		try {
+			Git.cloneRepository()
+				.setURI(repoUrl)
+				.setDirectory(tempDir)
+				.call().close();
+
+			File readmeFile = new File(tempDir, "README.md");
+			if (readmeFile.exists()) 
+				output = readFileToString(readmeFile);
+			else
+				output = "README.md not found.";
+
+		} catch (final Exception e) {
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+			output = sw.toString();
+
+		} finally {
+			if (tempDir.exists()) deleteRecursively(tempDir);
+			
+			final String finalOutput = output;
+			new Handler(Looper.getMainLooper()).post(new Runnable() {
+					@Override
+					public void run() {
+						saveOutput(finalOutput);
+					}
+				});
+		}
 	}
 	
 	void saveOutput(String output){
