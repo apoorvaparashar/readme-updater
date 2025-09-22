@@ -1,6 +1,6 @@
 # readme-updater\*
 
-**android app for updating github readme directly on your home screen**
+**android app for updating README.md directly on your home screen. this should help you get productive somehow, probably**
 
 <br>
 
