@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +16,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.concurrent.Executors;
 import org.eclipse.jgit.api.Git;
 
 public class MainActivity extends Activity {
@@ -23,6 +28,8 @@ public class MainActivity extends Activity {
     Button fetchAndCloseButton;
     TextView outputTextview;
     EditText repoLinkEdittext;
+	boolean buttonOnClickCloseApp = false;
+	String repositoryURL;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,37 +42,33 @@ public class MainActivity extends Activity {
         fetchAndCloseButton = findViewById(R.id.update_and_close_button);
         
         SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
-        repoLinkEdittext.setText(sp.getString(REPO_URL_KEY, ""));
+		repositoryURL = sp.getString(REPO_URL_KEY, "");
+        repoLinkEdittext.setText(repositoryURL);
         
         fetchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveData(false);
+                    saveData();
                 }
             });
             
         fetchAndCloseButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveData(true);
+					buttonOnClickCloseApp = true;
+					saveData();
                 }
             });
     }
     
-    void saveData(final boolean closeAfter){
-        final String repositoryURL = repoLinkEdittext.getText().toString().trim();
+    void saveData(){
+        repositoryURL = repoLinkEdittext.getText().toString().trim();
 		if (! repositoryURL.startsWith("https://")) return;
 		
-        String output = fetchReadme(this, repositoryURL);
-		
-		final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
-		spEditor.putString(WIDGET_STRING_KEY, output);
-		spEditor.putString(REPO_URL_KEY, repositoryURL);
-		spEditor.apply();
-
-		updateWidget();
-
-		if(closeAfter) finish();
+		outputTextview.setText("Please Wait...");
+		fetchButton.setEnabled(false);
+		fetchAndCloseButton.setEnabled(false);
+        fetchReadme(this, repositoryURL);
     }
     
     void updateWidget(){
@@ -75,25 +78,58 @@ public class MainActivity extends Activity {
         Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
     }
 	
-	public static String fetchReadme(final Context context, final String repoUrl) {
-		File tempDir = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
-		String content = "README.md not found.";
+	public void fetchReadme(final Context context, final String repoUrl) {
+		Executors.newSingleThreadExecutor().execute(new Runnable() {
+				@Override
+				public void run() {
+					File tempDir = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
+					try {
+						Git.cloneRepository()
+							.setURI(repoUrl)
+							.setDirectory(tempDir)
+							.call().close();
 
-		try {
-			Git.cloneRepository()
-				.setURI(repoUrl)
-				.setDirectory(tempDir)
-				.call().close();
+						String content = "README.md not found.";
+						File readmeFile = new File(tempDir, "README.md");
+						if (readmeFile.exists()) content = readFileToString(readmeFile);
 
-			File readmeFile = new File(tempDir, "README.md");
-			if (readmeFile.exists()) content = readFileToString(readmeFile);
+						final String finalContent = content;
+						new Handler(Looper.getMainLooper()).post(new Runnable() {
+								@Override
+								public void run() {
+									saveOutput(finalContent);
+								}
+							});
+					} catch (final Exception e) {
+						new Handler(Looper.getMainLooper()).post(new Runnable() {
+								@Override
+								public void run() {
+									StringWriter sw = new StringWriter();
+									PrintWriter pw = new PrintWriter(sw);
+									e.printStackTrace(pw);
+									saveOutput(sw.toString());
+								}
+							});
+					} finally {
+						if (tempDir.exists()) deleteRecursively(tempDir);
+					}
+				}
+			});
+	}
+	
+	void saveOutput(String output){
+		outputTextview.setText(output);
+		fetchButton.setEnabled(true);
+		fetchAndCloseButton.setEnabled(true);
 
-		} catch (Exception e) {
-			content = "Error: " + e.getMessage();
-		}
+		final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
+		spEditor.putString(WIDGET_STRING_KEY, output);
+		spEditor.putString(REPO_URL_KEY, repositoryURL);
+		spEditor.apply();
 
-		if (tempDir.exists()) deleteRecursively(tempDir);
-		return content;
+		updateWidget();
+
+		if(buttonOnClickCloseApp) finish();
 	}
 
 	private static String readFileToString(File file) throws IOException {

@@ -33,14 +33,14 @@
 		android:layout_width="match_parent"
 		style="?android:attr/buttonBarButtonStyle"
 		android:layout_height="wrap_content"
-		android:text="update widget"
+		android:text="update widget with README.md"
 		android:id="@+id/update_button"/>
-    
-    <Button
-        android:layout_width="match_parent"
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_height="wrap_content"
-        android:text="update widget and close"
+
+	<Button
+		android:layout_width="match_parent"
+		style="?android:attr/buttonBarButtonStyle"
+		android:layout_height="wrap_content"
+		android:text="update widget with README.md and close app"
 		android:id="@+id/update_and_close_button"/>
 
 	<View
