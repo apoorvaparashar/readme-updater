@@ -7,13 +7,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,16 +23,22 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executors;
 import org.eclipse.jgit.api.Git;
-import android.widget.CompoundButton;
 
 public class MainActivity extends Activity {
     final static String REPO_URL_KEY = "REPO_URL_KEY";
     final static String WIDGET_STRING_KEY = "WIDGET_STRING_KEY";
-    Button fetchButton;
-    Button fetchAndCloseButton;
-    TextView outputEdittext;
+
     EditText repoLinkEdittext;
+
+	LinearLayout outputActionsLayout;
 	CheckBox isLineWrapCheckbox;
+	Button editButton;
+	Button dailyQuoteButton;
+
+    EditText outputEdittext;
+	Button fetchButton;
+    Button fetchAndCloseButton;
+
 	boolean buttonOnClickCloseApp = false;
 	String repositoryURL;
     
@@ -42,10 +48,17 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         
         repoLinkEdittext = findViewById(R.id.repo_link_edittext);
-        outputEdittext = findViewById(R.id.command_output_edittext);
-        fetchButton = findViewById(R.id.update_button);
-        fetchAndCloseButton = findViewById(R.id.update_and_close_button);
+
+		outputActionsLayout = findViewById(R.id.output_actions_layout);
 		isLineWrapCheckbox = findViewById(R.id.is_linewrap_checkbox);
+		editButton = findViewById(R.id.edit_button);
+		dailyQuoteButton = findViewById(R.id.daily_quote_button);
+
+        outputEdittext = findViewById(R.id.command_output_edittext);
+		fetchButton = findViewById(R.id.update_button);
+        fetchAndCloseButton = findViewById(R.id.update_and_close_button);
+
+		outputActionsLayout.setVisibility(View.GONE);
 		
 		outputEdittext.setFocusable(false);
 		outputEdittext.setFocusableInTouchMode(false);
@@ -133,6 +146,7 @@ public class MainActivity extends Activity {
 	
 	void saveOutput(String output){
 		outputEdittext.setText(output);
+		outputActionsLayout.setVisibility(View.VISIBLE);
 		fetchButton.setEnabled(true);
 		fetchAndCloseButton.setEnabled(true);
 
