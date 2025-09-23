@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
         fetchButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    saveData();
+                    startFetchReadme();
                 }
             });
             
@@ -78,7 +78,7 @@ public class MainActivity extends Activity {
                 @Override
                 public void onClick(View v) {
 					buttonOnClickCloseApp = true;
-					saveData();
+					startFetchReadme();
                 }
             });
 		
@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
 		});
     }
     
-    void saveData(){
+    void startFetchReadme(){
         repositoryURL = repoLinkEdittext.getText().toString().trim();
 		if (! repositoryURL.startsWith("https://")) return;
 		
@@ -138,13 +138,13 @@ public class MainActivity extends Activity {
 			new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
 					public void run() {
-						saveOutput(finalOutput);
+						onAfterFetchReadme(finalOutput);
 					}
 				});
 		}
 	}
 	
-	void saveOutput(String output){
+	void onAfterFetchReadme(String output){
 		outputEdittext.setText(output);
 		outputActionsLayout.setVisibility(View.VISIBLE);
 		fetchButton.setEnabled(true);
