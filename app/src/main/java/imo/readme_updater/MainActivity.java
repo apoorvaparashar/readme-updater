@@ -1,7 +1,9 @@
 package imo.readme_updater;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -23,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executors;
 import org.eclipse.jgit.api.Git;
+import android.view.Gravity;
 
 public class MainActivity extends Activity {
     final static String REPO_URL_KEY = "REPO_URL_KEY";
@@ -39,9 +42,12 @@ public class MainActivity extends Activity {
 	Button fetchButton;
     Button fetchAndCloseButton;
 
-	boolean buttonOnClickCloseApp = false;
-	String repositoryURL;
     
+	boolean buttonOnClickCloseApp = false;
+	boolean isInEditMode = false;
+	String repositoryURL;
+    String readmeContent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,6 +93,45 @@ public class MainActivity extends Activity {
 			public void onCheckedChanged(CompoundButton v, boolean isChecked){
 				outputEdittext.setHorizontallyScrolling(isChecked);
 				outputEdittext.setMovementMethod(new ScrollingMovementMethod());
+			}
+		});
+
+		editButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// SWITCH TO EDIT MODE
+				if(! isInEditMode){
+					isInEditMode = !isInEditMode;
+					outputEdittext.setFocusable(true);
+					outputEdittext.setFocusableInTouchMode(true);
+					outputEdittext.requestFocus();
+					editButton.setText("SAVE");
+					return;
+				}
+
+				// SWITCH TO SAVE MODE
+				if(readmeContent.equals(outputEdittext.getText().toString())){
+					showToast("No changes detected.");
+					return;
+				}
+				
+				isInEditMode = !isInEditMode;
+				AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+				builder.setTitle("Save README.md");
+				builder.setMessage("Are you sure you want to save the README.md?");
+				builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						outputEdittext.setFocusable(false);
+						outputEdittext.setFocusableInTouchMode(false);
+						// TODO: save README.md to file
+						// TODO: commit README.md
+						// TODO: push to repository link
+						editButton.setText("EDIT");
+					}
+				});
+				builder.setNegativeButton("No", null);
+				builder.show();
 			}
 		});
     }
@@ -145,6 +190,7 @@ public class MainActivity extends Activity {
 	}
 	
 	void onAfterFetchReadme(String output){
+		readmeContent = output;
 		outputEdittext.setText(output);
 		outputActionsLayout.setVisibility(View.VISIBLE);
 		fetchButton.setEnabled(true);
@@ -164,7 +210,7 @@ public class MainActivity extends Activity {
         Intent intent = new Intent(MainActivity.this, Widget.class);
         intent.setAction(Widget.ACTION_WIDGET_UPDATE);
         sendBroadcast(intent);
-        Toast.makeText(MainActivity.this, "widget updated:D", Toast.LENGTH_SHORT).show();
+		showToast("widget updated:D");
     }
 
 	private static String readFileToString(File file) throws IOException {
@@ -185,5 +231,11 @@ public class MainActivity extends Activity {
 			}
 		}
 		fileOrDir.delete();
+	}
+	
+	void showToast(String string){
+		Toast toast = Toast.makeText(MainActivity.this, string, Toast.LENGTH_SHORT);
+		toast.setGravity(Gravity.TOP, 0, getActionBar().getHeight());
+		toast.show();
 	}
 }
