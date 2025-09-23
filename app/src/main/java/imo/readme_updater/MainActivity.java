@@ -65,6 +65,7 @@ public class MainActivity extends Activity {
         fetchAndCloseButton = findViewById(R.id.update_and_close_button);
 
 		outputActionsLayout.setVisibility(View.GONE);
+		dailyQuoteButton.setEnabled(false);
 		
 		outputEdittext.setFocusable(false);
 		outputEdittext.setFocusableInTouchMode(false);
@@ -105,6 +106,7 @@ public class MainActivity extends Activity {
 					outputEdittext.setFocusable(true);
 					outputEdittext.setFocusableInTouchMode(true);
 					outputEdittext.requestFocus();
+					dailyQuoteButton.setEnabled(true);
 					editButton.setText("SAVE");
 					return;
 				}
@@ -127,6 +129,7 @@ public class MainActivity extends Activity {
 						// TODO: save README.md to file
 						// TODO: commit README.md
 						// TODO: push to repository link
+						dailyQuoteButton.setEnabled(false);
 						editButton.setText("EDIT");
 					}
 				});
