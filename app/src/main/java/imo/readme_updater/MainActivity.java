@@ -39,12 +39,11 @@ public class MainActivity extends Activity {
 	Button editButton;
 	Button dailyQuoteButton;
 
-    EditText outputEdittext;
-	Button fetchButton;
-    Button fetchAndCloseButton;
+    EditText readmeEdittext;
+    Button exitButton;
 
-    
 	boolean buttonOnClickCloseApp = false;
+	boolean isInFetchMode = true;
 	boolean isInEditMode = false;
 	String repositoryURL;
     String readmeContent;
@@ -62,40 +61,33 @@ public class MainActivity extends Activity {
 		editButton = findViewById(R.id.edit_button);
 		dailyQuoteButton = findViewById(R.id.daily_quote_button);
 
-        outputEdittext = findViewById(R.id.command_output_edittext);
-		fetchButton = findViewById(R.id.update_button);
-        fetchAndCloseButton = findViewById(R.id.update_and_close_button);
-
+        readmeEdittext = findViewById(R.id.command_output_edittext);
+		exitButton = findViewById(R.id.exit_button);
+        
 		outputActionsLayout.setVisibility(View.GONE);
 		dailyQuoteButton.setEnabled(false);
 		
-		outputEdittext.setFocusable(false);
-		outputEdittext.setFocusableInTouchMode(false);
+		readmeEdittext.setFocusable(false);
+		readmeEdittext.setFocusableInTouchMode(false);
         
         SharedPreferences sp = getSharedPreferences("hehe", Context.MODE_PRIVATE);
 		repositoryURL = sp.getString(REPO_URL_KEY, "");
         repoLinkEdittext.setText(repositoryURL);
-        
-        fetchButton.setOnClickListener(new View.OnClickListener() {
+		
+		readmeEdittext.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startFetchReadme();
-                }
-            });
-            
-        fetchAndCloseButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-					buttonOnClickCloseApp = true;
+                    if(!isInFetchMode) return;
 					startFetchReadme();
+					isInFetchMode = false;
                 }
             });
 		
 		isLineWrapCheckbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(CompoundButton v, boolean isChecked){
-				outputEdittext.setHorizontallyScrolling(isChecked);
-				outputEdittext.setMovementMethod(new ScrollingMovementMethod());
+				readmeEdittext.setHorizontallyScrolling(isChecked);
+				readmeEdittext.setMovementMethod(new ScrollingMovementMethod());
 			}
 		});
 
@@ -105,16 +97,16 @@ public class MainActivity extends Activity {
 				// SWITCH TO EDIT MODE
 				if(! isInEditMode){
 					isInEditMode = !isInEditMode;
-					outputEdittext.setFocusable(true);
-					outputEdittext.setFocusableInTouchMode(true);
-					outputEdittext.requestFocus();
+					readmeEdittext.setFocusable(true);
+					readmeEdittext.setFocusableInTouchMode(true);
+					readmeEdittext.requestFocus();
 					dailyQuoteButton.setEnabled(true);
-					editButton.setText("SAVE");
+					editButton.setText("SAVE README.MD");
 					return;
 				}
 
 				// SWITCH TO SAVE MODE
-				if(readmeContent.equals(outputEdittext.getText().toString())){
+				if(readmeContent.equals(readmeEdittext.getText().toString())){
 					showToast("No changes detected.");
 					return;
 				}
@@ -126,13 +118,13 @@ public class MainActivity extends Activity {
 				builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
-						outputEdittext.setFocusable(false);
-						outputEdittext.setFocusableInTouchMode(false);
-						saveModifiedReadmeToFile(outputEdittext.getText().toString());
+						readmeEdittext.setFocusable(false);
+						readmeEdittext.setFocusableInTouchMode(false);
+						saveModifiedReadmeToFile(readmeEdittext.getText().toString());
 						// TODO: commit README.md
 						// TODO: push to repository link
 						dailyQuoteButton.setEnabled(false);
-						editButton.setText("EDIT");
+						editButton.setText("EDIT README.MD");
 					}
 				});
 				builder.setNegativeButton("No", null);
@@ -145,9 +137,7 @@ public class MainActivity extends Activity {
         repositoryURL = repoLinkEdittext.getText().toString().trim();
 		if (! repositoryURL.startsWith("https://")) return;
 		
-		outputEdittext.setText("Please Wait...");
-		fetchButton.setEnabled(false);
-		fetchAndCloseButton.setEnabled(false);
+		readmeEdittext.setText("Please Wait...");
         fetchReadmeAsync(this, repositoryURL);
     }
     
@@ -194,11 +184,9 @@ public class MainActivity extends Activity {
 	
 	void onAfterFetchReadme(String output){
 		readmeContent = output;
-		outputEdittext.setText(output);
+		readmeEdittext.setText(output);
 		outputActionsLayout.setVisibility(View.VISIBLE);
-		fetchButton.setEnabled(true);
-		fetchAndCloseButton.setEnabled(true);
-
+		
 		final SharedPreferences.Editor spEditor = getSharedPreferences("hehe", Context.MODE_PRIVATE).edit();
 		spEditor.putString(WIDGET_STRING_KEY, output);
 		spEditor.putString(REPO_URL_KEY, repositoryURL);
