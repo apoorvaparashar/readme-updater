@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,12 +21,12 @@ import android.widget.Toast;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.Executors;
 import org.eclipse.jgit.api.Git;
-import android.view.Gravity;
 
 public class MainActivity extends Activity {
     final static String REPO_URL_KEY = "REPO_URL_KEY";
@@ -47,6 +48,7 @@ public class MainActivity extends Activity {
 	boolean isInEditMode = false;
 	String repositoryURL;
     String readmeContent;
+	File readmeFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +128,7 @@ public class MainActivity extends Activity {
 					public void onClick(DialogInterface dialog, int which) {
 						outputEdittext.setFocusable(false);
 						outputEdittext.setFocusableInTouchMode(false);
-						// TODO: save README.md to file
+						saveModifiedReadmeToFile(outputEdittext.getText().toString());
 						// TODO: commit README.md
 						// TODO: push to repository link
 						dailyQuoteButton.setEnabled(false);
@@ -159,15 +161,15 @@ public class MainActivity extends Activity {
 	}
 	
 	private void fetchReadme(final Context context, final String repoUrl){
-		File tempDir = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
+		File clonedRepoFolder = new File(context.getCacheDir(), "jgit-temp-" + System.currentTimeMillis());
 		String output = "";
 		try {
 			Git.cloneRepository()
 				.setURI(repoUrl)
-				.setDirectory(tempDir)
+				.setDirectory(clonedRepoFolder)
 				.call().close();
 
-			File readmeFile = new File(tempDir, "README.md");
+			readmeFile = new File(clonedRepoFolder, "README.md");
 			if (readmeFile.exists()) 
 				output = readFileToString(readmeFile);
 			else
@@ -180,8 +182,6 @@ public class MainActivity extends Activity {
 			output = sw.toString();
 
 		} finally {
-			if (tempDir.exists()) deleteRecursively(tempDir);
-			
 			final String finalOutput = output;
 			new Handler(Looper.getMainLooper()).post(new Runnable() {
 					@Override
@@ -236,9 +236,30 @@ public class MainActivity extends Activity {
 		fileOrDir.delete();
 	}
 	
+	void saveModifiedReadmeToFile(String modifiedReadme){
+		try {
+			PrintWriter writer = new PrintWriter(new FileWriter(readmeFile));
+            writer.print(modifiedReadme);
+            showToast("successfully saved to readme file");
+        } catch (IOException e) {
+            StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			e.printStackTrace(pw);
+            showToast(sw.toString());
+        }
+	}
+	
 	void showToast(String string){
 		Toast toast = Toast.makeText(MainActivity.this, string, Toast.LENGTH_SHORT);
 		toast.setGravity(Gravity.TOP, 0, getActionBar().getHeight());
 		toast.show();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		File clonedRepoFolder = readmeFile.getParentFile();
+		if (clonedRepoFolder.exists()) deleteRecursively(clonedRepoFolder);
+		
 	}
 }
